@@ -108,8 +108,7 @@ if (typeof angular == 'undefined') {
 </script>
 
 <!--js to pdf library for save record as pdf-->
-<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.2/jspdf.debug.js"></script>-->
-<script src=https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.2.61/jspdf.debug.js></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.2/jspdf.debug.js"></script>
 
 <script>
 
