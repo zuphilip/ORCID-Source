@@ -32,7 +32,7 @@
         </div>
     </div>
     <div class="print-orcid-record">
-        <a onclick="javascript:demoFromHTML();"><span class="glyphicon glyphicon-floppy-save"></span></span> Save PDF</a>
+        <a onclick="javascript:testJsPdf();"><span class="glyphicon glyphicon-floppy-save"></span></span> Save PDF</a>
         <div class="popover-help-container">
             <a href="javascript:void(0);"><i class="glyphicon glyphicon-question-sign"></i></a>
             <div id="save-pdf-help" class="popover bottom">
