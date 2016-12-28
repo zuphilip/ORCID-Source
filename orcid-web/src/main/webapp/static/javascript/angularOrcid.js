@@ -509,7 +509,8 @@ var orcidNgModule = angular.module('orcidApp', ['ngCookies','ngSanitize', 'ui.mu
 orcidNgModule.factory("initialConfigService", ['$rootScope', '$location', function ($rootScope, $location) {
     //location requires param after # example: https://localhost:8443/orcid-web/my-orcid#?flag Otherwise it doesn't found the param and returns an empty object
     var configValues = {
-        modalManualEditVerificationEnabled: false
+        modalManualEditVerificationEnabled: false,
+        print: false
     };
 
     var locationObj = $location.search();
@@ -520,11 +521,21 @@ orcidNgModule.factory("initialConfigService", ['$rootScope', '$location', functi
         }
     };
 
+    //Manual Edit Modal
     if( locationObj.verifyEdit ){
         if( locationObj.verifyEdit == true || locationObj.verifyEdit == "true" ){
             configValues.modalManualEditVerificationEnabled = true;
         } else {
             configValues.modalManualEditVerificationEnabled = false;
+        }
+    }
+
+    //Print functionality enabled
+    if( locationObj.print ){
+        if( locationObj.print == true || locationObj.print == "true" ){
+            configValues.print = true;
+        } else {
+            configValues.print = false;
         }
     }
 
@@ -3086,7 +3097,6 @@ orcidNgModule.controller('WebsitesCtrl', ['$scope', '$rootScope', '$compile','bi
     }
         
     $scope.openEditModal = function(){
-        console.log( configuration.modalManualEditVerificationEnabled == false, configuration.modalManualEditVerificationEnabled );
         if(emailVerified === true || configuration.modalManualEditVerificationEnabled == false){
         	$scope.bulkEditShow = false;
             $.colorbox({
@@ -5805,15 +5815,17 @@ orcidNgModule.controller('PublicFundingCtrl',['$scope', '$compile', '$filter', '
 
 }]);
 
-orcidNgModule.controller('PublicPeerReviewCtrl',['$scope', '$compile', '$filter', 'workspaceSrvc', 'peerReviewSrvc',function ($scope, $compile, $filter, workspaceSrvc, peerReviewSrvc) {
-	 $scope.peerReviewSrvc = peerReviewSrvc;
-	 $scope.workspaceSrvc  = workspaceSrvc;
-	 $scope.showDetails = {};
-	 $scope.showElement = {};
-	 $scope.showPeerReviewDetails = new Array();
-	 $scope.sortHideOption = true;
-	 
-	 $scope.sortState = new ActSortState(GroupedActivities.PEER_REVIEW);
+orcidNgModule.controller('PublicPeerReviewCtrl',['$scope', '$compile', '$filter', 'workspaceSrvc', 'peerReviewSrvc', 'initialConfigService', function ($scope, $compile, $filter, workspaceSrvc, peerReviewSrvc, initialConfigService) {
+     var configuration = initialConfigService.getInitialConfiguration();
+     
+     $scope.printEnabled = configuration.print;
+     $scope.peerReviewSrvc = peerReviewSrvc;
+     $scope.showDetails = {};
+     $scope.showElement = {};
+     $scope.showPeerReviewDetails = new Array();
+     $scope.sortHideOption = true;
+     $scope.sortState = new ActSortState(GroupedActivities.PEER_REVIEW);
+     $scope.workspaceSrvc  = workspaceSrvc;
      
 	 $scope.sort = function(key) {
         $scope.sortState.sortBy(key);
@@ -5831,7 +5843,6 @@ orcidNgModule.controller('PublicPeerReviewCtrl',['$scope', '$compile', '$filter'
     $scope.hideTooltip = function (element){    	
         $scope.showElement[element] = false;
     };
-    
     
     $scope.showMoreDetails = function(putCode){  
     	$scope.showPeerReviewDetails.length = 0;
