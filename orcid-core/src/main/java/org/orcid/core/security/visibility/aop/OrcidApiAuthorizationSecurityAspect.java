@@ -172,15 +172,18 @@ public class OrcidApiAuthorizationSecurityAspect {
             }
             
             ScopePathType requiredScope = accessControl.requiredScope();
+            String clientId = null;
+            if (OrcidOAuth2Authentication.class.isAssignableFrom(authentication.getClass())){
+                OrcidOAuth2Authentication orcidAuth = (OrcidOAuth2Authentication) getAuthentication();
+                OAuth2Request authorization = orcidAuth.getOAuth2Request();
+                clientId = authorization.getClientId();
+            }
+            
             // If the required scope is */read-limited or */update
             if (isUpdateOrReadScope(requiredScope)) {                
                 // If the authentication contains a client_id, use it to check
                 // if it should be able to
-                if (OrcidOAuth2Authentication.class.isAssignableFrom(authentication.getClass())){
-                    OrcidOAuth2Authentication orcidAuth = (OrcidOAuth2Authentication) getAuthentication();
-
-                    OAuth2Request authorization = orcidAuth.getOAuth2Request();
-                    String clientId = authorization.getClientId();
+                if (clientId != null){
 
                     // #1: Get the user orcid
                     String userOrcid = getUserOrcidFromOrcidMessage(orcidMessage);
@@ -227,7 +230,7 @@ public class OrcidApiAuthorizationSecurityAspect {
                 }
 
             } else {
-                visibilityFilter.filter(orcidMessage, null, false, false, false, visibilities.toArray(new Visibility[visibilities.size()]));
+                visibilityFilter.filter(orcidMessage, clientId, false, false, false, visibilities.toArray(new Visibility[visibilities.size()]));
             }
             
             //This applies for given names that were filtered because of the new visibility field applied on them
