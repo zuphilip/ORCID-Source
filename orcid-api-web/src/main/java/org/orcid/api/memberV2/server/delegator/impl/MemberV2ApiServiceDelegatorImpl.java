@@ -34,6 +34,7 @@ import org.orcid.api.common.util.ElementUtils;
 import org.orcid.api.memberV2.server.delegator.MemberV2ApiServiceDelegator;
 import org.orcid.core.exception.MismatchedPutCodeException;
 import org.orcid.core.exception.OrcidAccessControlException;
+import org.orcid.core.exception.OrcidBadRequestException;
 import org.orcid.core.locale.LocaleManager;
 import org.orcid.core.manager.ActivitiesSummaryManager;
 import org.orcid.core.manager.AddressManager;
@@ -43,6 +44,7 @@ import org.orcid.core.manager.ClientDetailsManager;
 import org.orcid.core.manager.EmailManager;
 import org.orcid.core.manager.ExternalIdentifierManager;
 import org.orcid.core.manager.GroupIdRecordManager;
+import org.orcid.core.manager.OrcidSearchManager;
 import org.orcid.core.manager.OrcidSecurityManager;
 import org.orcid.core.manager.OtherNameManager;
 import org.orcid.core.manager.PeerReviewManager;
@@ -55,6 +57,7 @@ import org.orcid.core.manager.RecordManager;
 import org.orcid.core.manager.ResearcherUrlManager;
 import org.orcid.core.manager.SourceManager;
 import org.orcid.core.manager.WorkManager;
+import org.orcid.core.utils.ContributorUtils;
 import org.orcid.core.utils.SourceUtils;
 import org.orcid.core.version.impl.Api2_0_rc4_LastModifiedDatesHelper;
 import org.orcid.jaxb.model.client_rc4.Client;
@@ -82,6 +85,7 @@ import org.orcid.jaxb.model.record_rc4.Employment;
 import org.orcid.jaxb.model.record_rc4.Funding;
 import org.orcid.jaxb.model.record_rc4.Keyword;
 import org.orcid.jaxb.model.record_rc4.Keywords;
+import org.orcid.jaxb.model.record_rc4.OrcidIds;
 import org.orcid.jaxb.model.record_rc4.OtherName;
 import org.orcid.jaxb.model.record_rc4.OtherNames;
 import org.orcid.jaxb.model.record_rc4.PeerReview;
@@ -182,12 +186,20 @@ public class MemberV2ApiServiceDelegatorImpl implements
 
     @Resource
     private SourceUtils sourceUtils;
+    
+    @Resource
+    private ContributorUtils contributorUtils;
+
+    @Resource
+    private OrcidSearchManager orcidSearchManager;
 
     @Resource
     private ActivitiesSummaryManager activitiesSummaryManager;
 
     @Resource
     private PersonDetailsManager personDetailsManager;
+    
+    public static final int MAX_SEARCH_ROWS = 100;
 
     private long getLastModifiedTime(String orcid) {
         return profileEntityManager.getLastModified(orcid);
@@ -233,6 +245,7 @@ public class MemberV2ApiServiceDelegatorImpl implements
         ActivityUtils.cleanEmptyFields(w);
         ActivityUtils.setPathToActivity(w, orcid);
         sourceUtils.setSourceName(w);
+        contributorUtils.filterContributorPrivateData(w);
         return Response.ok(w).build();
     }
 
@@ -313,9 +326,10 @@ public class MemberV2ApiServiceDelegatorImpl implements
         orcidSecurityManager.checkAndFilter(orcid, f, ScopePathType.FUNDING_READ_LIMITED);
         ActivityUtils.setPathToActivity(f, orcid);
         sourceUtils.setSourceName(f);
+        contributorUtils.filterContributorPrivateData(f);
         return Response.ok(f).build();
     }
-
+    
     @Override
     public Response viewFundings(String orcid) {
         List<FundingSummary> fundingSummaries = profileFundingManager.getFundingSummaryList(orcid, getLastModifiedTime(orcid));
@@ -1003,7 +1017,30 @@ public class MemberV2ApiServiceDelegatorImpl implements
         sourceUtils.setSourceName(person);
         return Response.ok(person).build();
     }
-    
+
+    @Override
+    public Response searchByQuery(Map<String, List<String>> solrParams) {
+        orcidSecurityManager.checkScopes(ScopePathType.READ_PUBLIC);
+        validateSearchParams(solrParams);
+        OrcidIds orcidIds = orcidSearchManager.findOrcidIds(solrParams);
+        return Response.ok(orcidIds).build();
+    }
+
+    private void validateSearchParams(Map<String, List<String>> queryMap) {
+        List<String> rowsList = queryMap.get("rows");
+        if (rowsList != null && !rowsList.isEmpty()) {
+            try {
+                String rowsString = rowsList.get(0);
+                int rows = Integer.valueOf(rowsString);
+                if (rows < 0 || rows > MAX_SEARCH_ROWS) {
+                    throw new OrcidBadRequestException(localeManager.resolveMessage("apiError.badrequest_invalid_search_rows.exception"));
+                }
+            } catch (NumberFormatException e) {
+                throw new OrcidBadRequestException(localeManager.resolveMessage("apiError.badrequest_invalid_search_rows.exception"));
+            }
+        }
+    }
+
     @Override
     public Response viewClient(String clientId) {
         orcidSecurityManager.checkScopes(ScopePathType.READ_PUBLIC);
