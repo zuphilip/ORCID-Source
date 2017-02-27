@@ -37,8 +37,8 @@
 <#if devSandboxUrl != ''>
     <div class="dev-watermark"></div>
 </#if>
-<div class="container">
-    <div class="header center" ng-controller="headerCtrl">
+<div class="header" ng-controller="headerCtrl">
+    <div class="container">
         <div class="row">
 
             <div class="search col-md-11 col-md-offset-1 col-sm-12 col-xs-12" id="search" ng-show="searchVisible == true || settingsVisible == true" ng-cloak>
@@ -192,7 +192,7 @@
                                 <li class="leaf last"><a href="<@orcid.rootPath "/content/initiative" />"><@orcid.msg 'manage_delegators.learn_more.link.text' /></a></li>
                             </ul>
                         </li>
-    
+
                         <!-- DRUPAL WEBSITE MENUS -->
                         <!-- FOR ORGANIZATIONS -->
                         <li class="expanded">
@@ -202,7 +202,7 @@
                                 <li class="first leaf hidden-md hidden-lg hidden-sm visible-xs">
                                     <a href="${aboutUri}/organizations"><@orcid.msg 'public-layout.for_organizations'/></a>
                                 </li>
-    
+
                                 <li class="first leaf">
                                     <a href="${aboutUri}/organizations/funders" class="russian-fix" ng-click="handleMobileMenuOption($event); toggleSecondaryMenu('funders')"><@orcid.msg 'public-layout.funders'/><span class="more" ng-class="{'less':secondaryMenuVisible['funders'] == true}"></span></a> <!-- Updated according Drupal website structure -->
                                     <ul class="menu" ng-show="secondaryMenuVisible['funders'] == true">
@@ -304,7 +304,7 @@
                         <!-- ABOUT -->
                         <li class="expanded"><a href="${aboutUri}/about" ng-click="handleMobileMenuOption($event)"><@orcid.msg
                                 'public-layout.about'/></a>
-    
+
                             <ul class="menu lang-fixes">
                                 <!-- Mobile view Only -->
                                 <li><a href="${aboutUri}/about"
@@ -477,7 +477,7 @@
                             </@security.authorize>
                         
                         </li>
-    
+
                     </ul>
                     <#--<#if isProxy><#include "/common/change_proxy.ftl" /></#if>-->
                 </div>
@@ -501,7 +501,11 @@
             </#if>
              -->    
         </div><!-- .row -->
-    </div><!-- .header -->
+        
+    </div>
+</div><!-- .header -->
+<div class="container">
+    
     <div id="main" role="main" class="main">
         <#include '../common/maintenance_header.ftl'/> <#-- wtf --> <#nested>
     </div>
