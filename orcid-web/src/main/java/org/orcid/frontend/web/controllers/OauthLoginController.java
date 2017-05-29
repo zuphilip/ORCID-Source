@@ -68,9 +68,9 @@ public class OauthLoginController extends OauthControllerBase {
         else if (url.toLowerCase().contains("show_login=false"))
             showLogin = false;
         
-        //Check if userId is set so we should show the login screen
-        if(!PojoUtil.isEmpty(requestInfoForm.getUserId())) {
-            showLogin = true;
+        // Check for non-existant email
+        if(PojoUtil.isEmpty(requestInfoForm.getUserId()) && !PojoUtil.isEmpty(requestInfoForm.getUserEmail())) {
+            showLogin = false;
         }
                                                         
         // Check that the client have the required permissions
