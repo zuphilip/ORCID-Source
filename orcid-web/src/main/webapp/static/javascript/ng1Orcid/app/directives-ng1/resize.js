@@ -1,4 +1,4 @@
-angular.module('orcidApp').directive('resize', function ($window) {
+angular.module('orcidApp').directive('resize', function ($window, $timeout) {
     return function ($scope, element) {
         var w = angular.element($window);
         /*
@@ -26,7 +26,7 @@ angular.module('orcidApp').directive('resize', function ($window) {
         }, true);
     
         w.bind('resize', function () {
-            $scope.$apply();
+            $timeout();
         });
     }
 });
