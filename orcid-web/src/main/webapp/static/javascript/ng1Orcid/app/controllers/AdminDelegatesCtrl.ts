@@ -9,8 +9,10 @@ export const adminDelegatesCtrl = angular.module('orcidApp').controller(
     'adminDelegatesCtrl',
     [
         '$scope',
+        '$timeout',
         function (
-            $scope
+            $scope,
+            $timeout
         ){
             $scope.managed_verified = false;
             $scope.request = {trusted : {errors: [], value: ''}, managed : {errors: [], value: ''}};
@@ -33,19 +35,20 @@ export const adminDelegatesCtrl = angular.module('orcidApp').controller(
                     type: 'GET',
                     dataType: 'json',
                     success: function(data){
+                        $timeout(function(){
                             if(data) {
                                 if(whichField == 'trusted') {
                                     $scope.trusted_verified = true;
                                 } else {
                                     $scope.managed_verified = true;
                                 }
-                                $scope.$apply();
                             }
-                        }
-                    }).fail(function(error) {
-                        // something bad is happening!
-                        console.log("Error getting account details for: " + orcid);
-                    });
+                        });
+                    }
+                }).fail(function(error) {
+                    // something bad is happening!
+                    console.log("Error getting account details for: " + orcid);
+                });
             };
 
             $scope.confirmDelegatesProcess = function() {
@@ -57,11 +60,12 @@ export const adminDelegatesCtrl = angular.module('orcidApp').controller(
                     dataType: 'json',
                     data: angular.toJson($scope.request),
                     success: function(data){
-                        $scope.request = data;
-                        if(data.successMessage) {
-                            $scope.success = true;
-                        }
-                        $scope.$apply();
+                        $timeout(function(){
+                            $scope.request = data;
+                            if(data.successMessage) {
+                                $scope.success = true;
+                            }
+                        }); 
                     }
                 }).fail(function(error) {
                     // something bad is happening!

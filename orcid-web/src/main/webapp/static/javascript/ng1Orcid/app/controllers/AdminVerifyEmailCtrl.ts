@@ -9,9 +9,11 @@ export const adminVerifyEmailCtrl = angular.module('orcidApp').controller(
     [
         '$compile', 
         '$scope',
+        '$timeout',
         function (
             $compile,
-            $scope
+            $scope,
+            $timeout
         ){
             $scope.showSection = false;
 
@@ -28,7 +30,7 @@ export const adminVerifyEmailCtrl = angular.module('orcidApp').controller(
                     data: $scope.email,
                     contentType: 'application/json;charset=UTF-8',
                     success: function(data){
-                        $scope.$apply(function(){
+                        $timeout(function(){
                             $scope.result = data;
                         });
                     }
