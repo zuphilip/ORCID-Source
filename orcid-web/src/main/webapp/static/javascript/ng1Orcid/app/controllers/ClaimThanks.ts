@@ -11,9 +11,11 @@ export const ClaimThanks = angular.module('orcidApp').controller(
     'ClaimThanks', 
     [
         '$scope', 
+        '$timeout',
         '$compile', 
         function (
-            $scope, 
+            $scope,
+            $timeout, 
             $compile
         ) {
             $scope.close = function () {
@@ -25,9 +27,10 @@ export const ClaimThanks = angular.module('orcidApp').controller(
                     url: getBaseUri() + '/my-orcid/sourceGrantReadWizard.json',
                     dataType: 'json',
                     success: function(data) {
-                        $scope.sourceGrantReadWizard = data;
-                        $scope.$apply();
-                        $scope.showThanks();
+                        $timeout(function(){
+                            $scope.sourceGrantReadWizard = data;
+                        });
+                        $scope.showThanks(); 
                     }
                 }).fail(function(){
                     // something bad is happening!
@@ -40,20 +43,20 @@ export const ClaimThanks = angular.module('orcidApp').controller(
                 var colorboxHtml;
                 if ($scope.sourceGrantReadWizard.url == null) {
                     colorboxHtml = $compile($('#claimed-record-thanks').html())($scope);
-                }
-                else {
+                } else {
                     colorboxHtml = $compile($('#claimed-record-thanks-source-grand-read').html())($scope);
                 }
-                $.colorbox({
-                    html : colorboxHtml,
-                    escKey: true,
-                    overlayClose: true,
-                    transition: 'fade',
-                    close: '',
-                    scrolling: false
-                            });
-                $scope.$apply(); // this seems to make sure angular renders in the colorbox
-                $.colorbox.resize();
+               $timeout(function(){
+                    $.colorbox({
+                        html : colorboxHtml,
+                        escKey: true,
+                        overlayClose: true,
+                        transition: 'fade',
+                        close: '',
+                        scrolling: false
+                    });
+                    $.colorbox.resize();
+                });   
             };
 
             $scope.yes = function () {

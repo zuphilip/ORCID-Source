@@ -9,11 +9,13 @@ export const ClaimCtrl = angular.module('orcidApp').controller(
     'ClaimCtrl', 
     [
         '$compile', 
-        '$scope', 
+        '$scope',
+        '$timeout', 
         'commonSrvc', 
         function (
             $compile, 
             $scope, 
+            $timeout,
             commonSrvc
         ) {
             $scope.postingClaim = false;
@@ -23,8 +25,9 @@ export const ClaimCtrl = angular.module('orcidApp').controller(
                     url: $scope.getClaimAjaxUrl(),
                     dataType: 'json',
                     success: function(data) {
-                       $scope.register = data;
-                    $scope.$apply();
+                        $timeout(function(){
+                            $scope.register = data;
+                        });
                     }
                 }).fail(function(){
                     // something bad is happening!
@@ -63,16 +66,17 @@ export const ClaimCtrl = angular.module('orcidApp').controller(
                     contentType: 'application/json;charset=UTF-8',
                     dataType: 'json',
                     success: function(data) {
-                        $scope.register = data;
+                        $timeout(function(){
+                            $scope.register = data;
 
-                        if ($scope.register.errors.length == 0) {
-                            if ($scope.register.url != null) {
-                                orcidGA.gaPush(['send', 'event', 'RegGrowth', 'New-Registration', 'Website']);
-                                orcidGA.windowLocationHrefDelay($scope.register.url);
+                            if ($scope.register.errors.length == 0) {
+                                if ($scope.register.url != null) {
+                                    orcidGA.gaPush(['send', 'event', 'RegGrowth', 'New-Registration', 'Website']);
+                                    orcidGA.windowLocationHrefDelay($scope.register.url);
+                                }
                             }
-                        }
-                        $scope.postingClaim = false;
-                        $scope.$apply();
+                            $scope.postingClaim = false;
+                        });
                     }
                 }).fail(function() {
                     // something bad is happening!
@@ -92,9 +96,9 @@ export const ClaimCtrl = angular.module('orcidApp').controller(
                     contentType: 'application/json;charset=UTF-8',
                     dataType: 'json',
                     success: function(data) {
-                        // alert(angular.toJson(data));
-                        commonSrvc.copyErrorsLeft($scope.register, data);
-                        $scope.$apply();
+                        $timeout(function(){
+                            commonSrvc.copyErrorsLeft($scope.register, data);
+                        });
                     }
                 }).fail(function() {
                     // something bad is happening!
