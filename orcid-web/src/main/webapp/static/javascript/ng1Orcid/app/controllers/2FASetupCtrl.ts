@@ -9,10 +9,12 @@ export const _2FASetupCtrl = angular.module('orcidApp').controller(
     '2FASetupCtrl', 
     [
         '$compile', 
-        '$scope', 
+        '$scope',
+        '$timeout',   
         function (
             $compile,
-            $scope
+            $scope,
+            $timeout
         ) {
             
             $scope.cancel2FASetup = function() {
@@ -76,16 +78,17 @@ export const _2FASetupCtrl = angular.module('orcidApp').controller(
                     data: angular.toJson($scope.twoFactorAuthRegistration),
                     contentType: 'application/json;charset=UTF-8',
                     type: 'POST',
-                    success: function(data) {               
-                        if (data.valid) {
-                            $scope.showSetup2FA = false;
-                            $scope.show2FARecoveryCodes = true;
-                            $scope.recoveryCodes = data.backupCodes;
-                            $scope.showInvalidCodeError=false;
-                        } else {
-                            $scope.showInvalidCodeError=true;
-                        }
-                        $scope.$apply();
+                    success: function(data) {  
+                        $timeout(function(){
+                            if (data.valid) {
+                                $scope.showSetup2FA = false;
+                                $scope.show2FARecoveryCodes = true;
+                                $scope.recoveryCodes = data.backupCodes;
+                                $scope.showInvalidCodeError=false;
+                            } else {
+                                $scope.showInvalidCodeError=true;
+                            }
+                        });             
                     }
                 }).fail(function(xhr, status, error) {
                     var err = eval("(" + xhr.responseText + ")");
@@ -108,8 +111,9 @@ export const _2FASetupCtrl = angular.module('orcidApp').controller(
                             url: getBaseUri() + '/2FA/register.json',
                             dataType: 'json',
                             success: function(data) {
-                                $scope.twoFactorAuthRegistration = data;
-                                $scope.$apply();
+                                $timeout(function(){
+                                    $scope.twoFactorAuthRegistration = data;
+                                });
                             }
                         }).fail(function(err) {
                             console.log("An error occurred getting 2FA registration object");
@@ -126,10 +130,11 @@ export const _2FASetupCtrl = angular.module('orcidApp').controller(
                     url: getBaseUri() + '/2FA/secret.json',
                     dataType: 'json',
                     success: function(data) {
-                        $scope.textCodeFor2FA = data.secret;
-                        $scope.showTextCode = true;
-                        $scope.showQRCode = false;
-                        $scope.$apply();
+                        $timeout(function(){
+                            $scope.textCodeFor2FA = data.secret;
+                            $scope.showTextCode = true;
+                            $scope.showQRCode = false;
+                        });
                     }
                 }).fail(function(err) {
                     console.log("An error occurred getting 2FA secret");

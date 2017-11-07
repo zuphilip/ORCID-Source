@@ -9,10 +9,12 @@ export const _2FAStateCtrl = angular.module('orcidApp').controller(
     '2FAStateCtrl', 
     [
         '$compile', 
-        '$scope', 
+        '$scope',
+        '$timeout',  
         function (
             $compile,
-            $scope
+            $scope,
+            $timeout
         ) {
     
             $scope.check2FAState = function() {
@@ -45,9 +47,10 @@ export const _2FAStateCtrl = angular.module('orcidApp').controller(
             };
 
             $scope.update2FAStatus = function(status) {
-                $scope.showEnabled2FA = status.enabled;
-                $scope.showDisabled2FA = !status.enabled;
-                $scope.$apply();
+                $timeout(function(){
+                    $scope.showEnabled2FA = status.enabled;
+                    $scope.showDisabled2FA = !status.enabled;
+                });
             };
         }
     ]
