@@ -11,10 +11,12 @@ export const ClientEditCtrl = angular.module('orcidApp').controller(
     'ClientEditCtrl',
     [
         '$compile', 
-        '$scope', 
+        '$scope',
+        '$timeout', 
         function (
             $compile,
-            $scope
+            $scope,
+            $timeout
         ){
             $scope.authorizeUrlBase = getBaseUri() + '/oauth/authorize';
             $scope.authorizeURLTemplate = $scope.authorizeUrlBase + '?client_id=[CLIENT_ID]&response_type=code&redirect_uri=[REDIRECT_URI]&scope=[SCOPES]';
@@ -65,8 +67,9 @@ export const ClientEditCtrl = angular.module('orcidApp').controller(
                     dataType: 'json',
                     success: function(data) {
                         if(data.errors != null && data.errors.length > 0){
-                            $scope.newClient = data;
-                            $scope.$apply();
+                            $timeout(function(){
+                                $scope.newClient = data;
+                            });    
                         } else {
                             // If everything worked fine, reload the list of clients
                             $scope.getClients();
@@ -197,8 +200,9 @@ export const ClientEditCtrl = angular.module('orcidApp').controller(
                     dataType: 'json',
                     success: function(data) {
                         if(data.errors != null && data.errors.length > 0){
-                            $scope.clientToEdit = data;
-                            $scope.$apply();
+                            $timeout(function(){
+                                $scope.clientToEdit = data;
+                            });   
                         } else {
                             // If everything worked fine, reload the list of clients
                             $scope.getClients();
@@ -230,7 +234,7 @@ export const ClientEditCtrl = angular.module('orcidApp').controller(
                     url: getBaseUri() + '/group/developer-tools/get-clients.json',
                     dataType: 'json',
                     success: function(data) {
-                        $scope.$apply(function(){
+                        $timeout(function(){
                             $scope.clients = data;
                             $scope.creating = false;
                             $scope.editing = false;
@@ -359,7 +363,7 @@ export const ClientEditCtrl = angular.module('orcidApp').controller(
                     url: getBaseUri() + '/group/developer-tools/client.json',
                     dataType: 'json',
                     success: function(data) {
-                        $scope.$apply(function() {
+                        $timeout(function() {
                             $scope.newClient = data;
                             $scope.creating = true;
                             $scope.listing = false;
@@ -425,8 +429,9 @@ export const ClientEditCtrl = angular.module('orcidApp').controller(
                     dataType: 'json',
                     success: function(data) {
                         if(data.errors != null && data.errors.length > 0){
-                            $scope.clientToEdit = data;
-                            $scope.$apply();
+                            $timeout(function() {
+                                $scope.clientToEdit = data;
+                            });
                         } else {
                             // If everything worked fine, reload the list of clients
                             $scope.getClients();

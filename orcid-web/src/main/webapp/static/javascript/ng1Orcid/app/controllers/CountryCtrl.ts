@@ -15,6 +15,7 @@ export const CountryCtrl = angular.module('orcidApp').controller(
         '$scope', 
         '$rootScope', 
         '$compile', 
+        '$timeout',
         'bioBulkSrvc', 
         'commonSrvc', 
         'emailSrvc', 
@@ -24,6 +25,7 @@ export const CountryCtrl = angular.module('orcidApp').controller(
             $scope, 
             $rootScope, 
             $compile, 
+            $timeout,
             bioBulkSrvc, 
             commonSrvc, 
             emailSrvc, 
@@ -109,54 +111,55 @@ export const CountryCtrl = angular.module('orcidApp').controller(
                     url: getBaseUri() + '/account/countryForm.json',
                     dataType: 'json',
                     success: function(data) {
-                        $scope.countryForm = data;                
-                        $scope.newElementDefaultVisibility = $scope.countryForm.visibility.visibility;
-                        //If there is at least one element, iterate over them to see if they have the same visibility, to set the default  visibility element
-                        if($scope.countryForm != null && $scope.countryForm.addresses != null && $scope.countryForm.addresses.length > 0) {
-                            var highestDisplayIndex = null;
-                            var itemVisibility = null;
-                            
-                            for(var i = 0; i < $scope.countryForm.addresses.length; i ++) {
-                                if($scope.countryForm.addresses[i].visibility != null && $scope.countryForm.addresses[i].visibility.visibility) {
-                                    itemVisibility = $scope.countryForm.addresses[i].visibility.visibility;
-                                }
-                                /**
-                                 * The default visibility should be set only when all elements have the same visibility, so, we should follow this rules: 
-                                 * 
-                                 * Rules: 
-                                 * - If the default visibility is null:
-                                 *  - If the item visibility is not null, set the default visibility to the item visibility
-                                 * - If the default visibility is not null:
-                                 *  - If the default visibility is not equals to the item visibility, set the default visibility to null and stop iterating 
-                                 * */
-                                if($scope.defaultVisibility == null) {
-                                    if(itemVisibility != null) {
-                                        $scope.defaultVisibility = itemVisibility;
-                                    }                           
-                                } else {
-                                    if(itemVisibility != null) {
-                                        if($scope.defaultVisibility != itemVisibility) {
+                        $timeout(function() {
+                            $scope.countryForm = data;                
+                            $scope.newElementDefaultVisibility = $scope.countryForm.visibility.visibility;
+                            //If there is at least one element, iterate over them to see if they have the same visibility, to set the default  visibility element
+                            if($scope.countryForm != null && $scope.countryForm.addresses != null && $scope.countryForm.addresses.length > 0) {
+                                var highestDisplayIndex = null;
+                                var itemVisibility = null;
+                                
+                                for(var i = 0; i < $scope.countryForm.addresses.length; i ++) {
+                                    if($scope.countryForm.addresses[i].visibility != null && $scope.countryForm.addresses[i].visibility.visibility) {
+                                        itemVisibility = $scope.countryForm.addresses[i].visibility.visibility;
+                                    }
+                                    /**
+                                     * The default visibility should be set only when all elements have the same visibility, so, we should follow this rules: 
+                                     * 
+                                     * Rules: 
+                                     * - If the default visibility is null:
+                                     *  - If the item visibility is not null, set the default visibility to the item visibility
+                                     * - If the default visibility is not null:
+                                     *  - If the default visibility is not equals to the item visibility, set the default visibility to null and stop iterating 
+                                     * */
+                                    if($scope.defaultVisibility == null) {
+                                        if(itemVisibility != null) {
+                                            $scope.defaultVisibility = itemVisibility;
+                                        }                           
+                                    } else {
+                                        if(itemVisibility != null) {
+                                            if($scope.defaultVisibility != itemVisibility) {
+                                                $scope.defaultVisibility = null;
+                                                break;
+                                            }
+                                        } else {
                                             $scope.defaultVisibility = null;
                                             break;
                                         }
-                                    } else {
-                                        $scope.defaultVisibility = null;
-                                        break;
-                                    }
-                                }                                                                   
-                            }
-                            //We have to iterate on them again to select the primary address
-                            for(var i = 0; i < $scope.countryForm.addresses.length; i ++) {
-                                //Set the primary element based on the display index
-                                if($scope.primaryElementIndex == null || highestDisplayIndex < $scope.countryForm.addresses[i].displayIndex) {
-                                    $scope.primaryElementIndex = i;
-                                    highestDisplayIndex = $scope.countryForm.addresses[i].displayIndex;
+                                    }                                                                   
                                 }
-                            }
-                        } else {
-                            $scope.defaultVisibility = $scope.countryForm.visibility.visibility;                    
-                        }     
-                        $scope.$apply();                
+                                //We have to iterate on them again to select the primary address
+                                for(var i = 0; i < $scope.countryForm.addresses.length; i ++) {
+                                    //Set the primary element based on the display index
+                                    if($scope.primaryElementIndex == null || highestDisplayIndex < $scope.countryForm.addresses[i].displayIndex) {
+                                        $scope.primaryElementIndex = i;
+                                        highestDisplayIndex = $scope.countryForm.addresses[i].displayIndex;
+                                    }
+                                }
+                            } else {
+                                $scope.defaultVisibility = $scope.countryForm.visibility.visibility;                    
+                            }     
+                        });               
                     }
                 }).fail(function(e){
                     // something bad is happening!
@@ -216,15 +219,15 @@ export const CountryCtrl = angular.module('orcidApp').controller(
                     type: 'POST',
                     url: getBaseUri() + '/account/countryForm.json',
                     success: function(data) {
-                        $scope.countryForm = data;
-                        if ($scope.countryForm.errors.length == 0){
-                            $.colorbox.close();
-                            $scope.getCountryForm();
-                        }else{
-                            console.log($scope.countryForm.errors);
-                        }
-                        
-                        $scope.$apply();
+                        $timeout(function() {
+                            $scope.countryForm = data;
+                            if ($scope.countryForm.errors.length == 0){
+                                $.colorbox.close();
+                                $scope.getCountryForm();
+                            }else{
+                                console.log($scope.countryForm.errors);
+                            }
+                        });
                     }
                 }).fail(function() {
                     // something bad is happening!
