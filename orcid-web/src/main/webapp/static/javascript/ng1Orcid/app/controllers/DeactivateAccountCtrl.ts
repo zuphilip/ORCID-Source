@@ -12,10 +12,12 @@ export const DeactivateAccountCtrl = angular.module('orcidApp').controller(
     'DeactivateAccountCtrl', 
     [
         '$compile', 
-        '$scope', 
+        '$scope',
+        '$timeout', 
         function (
             $compile,
-            $scope
+            $scope,
+            $timeout
         ) {
             $scope.closeModal = function() {
                 $.colorbox.close();
@@ -27,12 +29,12 @@ export const DeactivateAccountCtrl = angular.module('orcidApp').controller(
                     url: getBaseUri() + '/account/send-deactivate-account.json',
                     dataType: 'text',
                     success: function(data) {
-                        $scope.primaryEmail = data;
-                        $.colorbox({
-                            html : $compile($('#deactivate-account-modal').html())($scope)
+                        $timeout(function(){
+                            $scope.primaryEmail = data;
+                            $.colorbox({
+                                html : $compile($('#deactivate-account-modal').html())($scope)
+                            });
                         });
-                        $scope.$apply();
-                        $.colorbox.resize();
                     }
                 }).fail(function() {
                     // something bad is happening!

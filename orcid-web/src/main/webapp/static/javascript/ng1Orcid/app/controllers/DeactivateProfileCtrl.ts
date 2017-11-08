@@ -7,9 +7,11 @@ import {NgModule} from '@angular/core';
 export const DeactivateProfileCtrl = angular.module('orcidApp').controller(
     'DeactivateProfileCtrl', 
     [
-        '$scope', 
+        '$scope',
+        '$timeout', 
         function (
-            $scope
+            $scope,
+            $timeout
         ) {
             $scope.orcidsToDeactivate = "";
             $scope.showSection = false;
@@ -22,7 +24,7 @@ export const DeactivateProfileCtrl = angular.module('orcidApp').controller(
                     data: $scope.orcidsToDeactivate,
                     contentType: 'application/json;charset=UTF-8',
                     success: function(data){
-                        $scope.$apply(function(){
+                        $timeout(function(){
                             $scope.result = data;
                         });
                     }
