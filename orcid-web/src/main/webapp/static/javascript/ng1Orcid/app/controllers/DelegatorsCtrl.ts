@@ -13,9 +13,11 @@ export const DelegatorsCtrl = angular.module('orcidApp').controller(
     [
         '$compile', 
         '$scope', 
+        '$timeout',
         function (
             $compile,
-            $scope 
+            $scope,
+            $timeout 
         ){
             $scope.changeSorting = function(column) {
                 var sort = $scope.sort;
@@ -32,8 +34,9 @@ export const DelegatorsCtrl = angular.module('orcidApp').controller(
                     url: getBaseUri() + '/delegators/delegators-and-me.json',
                     dataType: 'json',
                     success: function(data) {
-                        $scope.delegators = data.delegators;
-                        $scope.$apply();
+                        $timeout(function(){
+                            $scope.delegators = data.delegators;
+                        });
                     }
                 }).fail(function(e) {
                     // something bad is happening!
@@ -73,10 +76,11 @@ export const DelegatorsCtrl = angular.module('orcidApp').controller(
             $("#delegatorsSearch").bind(
                 "typeahead:selected", 
                 function(datum) {
-                    if(!(<any>(datum)).noResults){
-                        $scope.selectDelegator(datum);
-                    }
-                    $scope.$apply();
+                    $timeout(function(){
+                        if(!(<any>(datum)).noResults){
+                            $scope.selectDelegator(datum);
+                        }
+                    });
                     return true;
                 }
             );

@@ -17,9 +17,11 @@ export const DelegatesCtrlV2 = angular.module('orcidApp').controller(
     [
         '$compile', 
         '$scope', 
+        '$timeout',
         function DelegatesCtrl(
             $compile,
-            $scope
+            $scope,
+            $timeout
         ){
             $scope.effectiveUserOrcid = orcidVar.orcidId;
             $scope.input = {};
@@ -48,16 +50,15 @@ export const DelegatesCtrlV2 = angular.module('orcidApp').controller(
                     data: angular.toJson(addDelegate),
                     contentType: 'application/json;charset=UTF-8',
                     success: function(data) {
-                        if(data.errors.length === 0){
-                            $scope.getDelegates();
-                            $scope.results.splice($scope.delegateIdx, 1);
-                            $scope.$apply();
-                            $scope.closeModal();
-                        }
-                        else{
-                            $scope.errors = data.errors;
-                            $scope.$apply();
-                        }
+                        $timeout(function(){
+                            if(data.errors.length === 0){
+                                $scope.getDelegates();
+                                $scope.results.splice($scope.delegateIdx, 1);
+                                $scope.closeModal();
+                            } else{
+                                $scope.errors = data.errors;
+                            }
+                        });
                     }
                 }).fail(function() {
                     console.log("Error adding delegate.");
@@ -81,23 +82,19 @@ export const DelegatesCtrlV2 = angular.module('orcidApp').controller(
                     data: angular.toJson(addDelegate),
                     contentType: 'application/json;charset=UTF-8',
                     success: function(data) {
-                        if(data.errors.length === 0){
-                            $scope.getDelegates();
-                            $scope.$apply();
-                            $scope.closeModal();
-                        }
-                        else{
-                            $scope.errors = data.errors;
-                            $scope.$apply();
-                        }
+                        $timeout(function(){
+                            if(data.errors.length === 0){
+                                $scope.getDelegates();
+                                $scope.closeModal();
+                            }
+                            else{
+                                $scope.errors = data.errors;
+                            }
+                        });
                     }
                 }).fail(function() {
                     console.log("Error adding delegate.");
                 });
-            };
-
-            $scope.areResults = function(){
-                return $scope.numFound != 0;
             };
             
             $scope.isPasswordConfirmationRequired = orcidVar.isPasswordConfirmationRequired;
@@ -173,17 +170,19 @@ export const DelegatesCtrlV2 = angular.module('orcidApp').controller(
                     url: getBaseUri() + '/account/delegates.json',
                     dataType: 'json',
                     success: function(data) {
-                        $scope.delegatesByOrcid = {};
-                        $scope.delegation = data;
-                        if(data != null){
-                            for(var i=0; i < data.length; i++){
-                                var delegate = data[i];
-                                $scope.delegatesByOrcid[delegate.receiverOrcid.value] = delegate;
+                        $timeout(function(){
+                            $scope.delegatesByOrcid = {};
+                            $scope.delegation = data;
+                            if(data != null){
+                                for(var i=0; i < data.length; i++){
+                                    var delegate = data[i];
+                                    $scope.delegatesByOrcid[delegate.receiverOrcid.value] = delegate;
+                                }
                             }
-                        }
-                        $scope.showInitLoader = false;
-                        $scope.$apply();
-                    }
+                            $scope.showInitLoader = false;
+                        
+                        });
+                    }    
                 }).fail(function() {
                     $scope.showInitLoader = false;
                     // something bad is happening!
@@ -236,42 +235,49 @@ export const DelegatesCtrlV2 = angular.module('orcidApp').controller(
                     dataType: 'json',
                     headers: { Accept: 'application/json'},
                     success: function(data) {
-                        var bottom = null;
-                        var newSearchResults = null;
-                        var newSearchResultsTop = null;
-                        var orcidList = data['result'];
-                        var showMoreButtonTop = null;
-                        var tempResults = null;
-                        $scope.numFound = data['num-found'];
+                        $timeout(function(){
+                            var bottom = null;
+                            var newSearchResults = null;
+                            var newSearchResultsTop = null;
+                            var orcidList = data['result'];
+                            var showMoreButtonTop = null;
+                            var tempResults = null;
 
-                        $scope.results = $scope.results.concat(orcidList); 
-                        
-                        if(!$scope.numFound){
-                            $('#no-results-alert').fadeIn(1200);
-                        }
-                        
-                        $scope.areMoreResults = $scope.numFound >= ($scope.start + $scope.rows);
-                        $scope.showLoader = false;
-                        $scope.$apply();
-                        
-                        newSearchResults = $('.new-search-result');
-                        
-                        if(newSearchResults.length > 0){
-                            newSearchResults.fadeIn(1200);
-                            newSearchResults.removeClass('new-search-result');
-                            newSearchResultsTop = newSearchResults.offset().top;
-                            showMoreButtonTop = $('#show-more-button-container').offset().top;
-                            bottom = $(window).height();
-                            if(showMoreButtonTop > bottom){
-                                $('html, body').animate(
-                                    {
-                                        scrollTop: newSearchResultsTop
-                                    },
-                                    1000,
-                                    'easeOutQuint'
-                                );
+                            
+                            $scope.results = $scope.results.concat(orcidList); 
+                            
+
+                            $scope.numFound = data['num-found'];
+
+                            if(!$scope.numFound){
+                                $('#no-results-alert').fadeIn(1200);
                             }
-                        }
+                            
+                            $scope.areMoreResults = $scope.numFound >= ($scope.start + $scope.rows);
+                            $scope.showLoader = false;
+                            $scope.$apply();
+    
+                            
+                            newSearchResults = $('.new-search-result');
+                            
+                            if(newSearchResults.length > 0){
+                                newSearchResults.fadeIn(1200);
+                                newSearchResults.removeClass('new-search-result');
+                                newSearchResultsTop = newSearchResults.offset().top;
+                                showMoreButtonTop = $('#show-more-button-container').offset().top;
+                                bottom = $(window).height();
+                                if(showMoreButtonTop > bottom){
+                                    $('html, body').animate(
+                                        {
+                                            scrollTop: newSearchResultsTop
+                                        },
+                                        1000,
+                                        'easeOutQuint'
+                                    );
+                                }
+                            }
+                        });   
+
                     }
                 }).fail(function(){
                     // something bad is happening!
@@ -299,15 +305,15 @@ export const DelegatesCtrlV2 = angular.module('orcidApp').controller(
                     data:  angular.toJson(revokeDelegate),
                     contentType: 'application/json;charset=UTF-8',
                     success: function(data) {
-                        if(data.errors.length === 0){
-                            $scope.getDelegates();
-                            $scope.$apply();
-                            $scope.closeModal();
-                        }
-                        else{
-                            $scope.errors = data.errors;
-                            $scope.$apply();
-                        }
+                        $timeout(function(){
+                            if(data.errors.length === 0){
+                                $scope.getDelegates();
+                                $scope.closeModal();
+                            }
+                            else{
+                                $scope.errors = data.errors;
+                            }
+                        });
                     }
                 }).fail(function() {
                     // something bad is happening!
@@ -336,9 +342,10 @@ export const DelegatesCtrlV2 = angular.module('orcidApp').controller(
                     dataType: 'json',
                     headers: { Accept: 'application/json'},
                     success: function(data) {
-                        $scope.confirmAddDelegateByEmail(data);
-                        $scope.showLoader = false;
-                        $scope.$apply();
+                        $timeout(function(){
+                            $scope.confirmAddDelegateByEmail(data);
+                            $scope.showLoader = false;
+                        });
                     }
                 }).fail(function(){
                     // something bad is happening!
