@@ -548,7 +548,7 @@
                         </form>
                 </div>
                 <div>
-                    <table class="ng-cloak table" ng-show="areResults()">
+                    <table class="ng-cloak table" ng-if="results.length > 0">
                         <thead>
                             <tr>
                                 <th width="20%">${springMacroRequestContext.getMessage("manage_bio_settings.thname")}</th>

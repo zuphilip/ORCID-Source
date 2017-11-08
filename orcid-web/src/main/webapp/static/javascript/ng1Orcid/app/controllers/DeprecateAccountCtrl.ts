@@ -12,12 +12,14 @@ export const DeprecateAccountCtrl = angular.module('orcidApp').controller(
     [
         '$compile', 
         '$rootScope', 
-        '$scope', 
+        '$scope',
+        '$timeout', 
         'emailSrvc', 
         function (
             $compile, 
             $rootScope, 
             $scope, 
+            $timeout,
             emailSrvc
         ) {
             $scope.emailSrvc = emailSrvc;
@@ -34,18 +36,17 @@ export const DeprecateAccountCtrl = angular.module('orcidApp').controller(
                     type: 'POST',
                     contentType: 'application/json;charset=UTF-8',
                     success: function(data) {
-                        $scope.deprecateProfilePojo = data;
-                        if (data.errors.length > 0) {
-                            $scope.$apply();
-                        } else {
-                            $.colorbox({
-                                html : $compile($('#confirm-deprecate-account-modal').html())($scope),
-                                escKey:false,
-                                overlayClose:true,
-                                close: '',
-                                });
-                        }
-                        $scope.$apply();
+                        $timeout(function(){
+                            $scope.deprecateProfilePojo = data;
+                            if (data.errors.length == 0) {
+                                $.colorbox({
+                                    html : $compile($('#confirm-deprecate-account-modal').html())($scope),
+                                    escKey:false,
+                                    overlayClose:true,
+                                    close: '',
+                                    });
+                            }
+                        });
                         $.colorbox.resize();
                     }
                 }).fail(function() {
@@ -59,8 +60,9 @@ export const DeprecateAccountCtrl = angular.module('orcidApp').controller(
                     url: getBaseUri() + '/account/deprecate-profile.json',
                     dataType: 'json',
                     success: function(data) {
-                        $scope.deprecateProfilePojo = data;
-                        $scope.$apply();
+                        $timeout(function(){
+                            $scope.deprecateProfilePojo = data;
+                        });
                     }
                 }).fail(function() {
                     console.log("An error occurred preparing deprecate profile");
@@ -78,14 +80,15 @@ export const DeprecateAccountCtrl = angular.module('orcidApp').controller(
                         emailSrvc.getEmails(function(emailData) {
                             $rootScope.$broadcast('rebuildEmails', emailData);
                         });
-                        $.colorbox({
-                            html : $compile($('#deprecate-account-confirmation-modal').html())($scope),
-                            escKey:false,
-                            overlayClose:true,
-                            close: '',
-                            onClosed: function(){ $scope.deprecateProfilePojo = null; $scope.$apply(); },
+                        $timeout(function(){
+                            $.colorbox({
+                                html : $compile($('#deprecate-account-confirmation-modal').html())($scope),
+                                escKey:false,
+                                overlayClose:true,
+                                close: '',
+                                onClosed: function(){ $timeout(function(){$scope.deprecateProfilePojo = null;});},
                             });
-                        $scope.$apply();
+                        });
                         $.colorbox.resize();
                     }
                 }).fail(function() {

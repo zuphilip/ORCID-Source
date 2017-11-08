@@ -56,14 +56,15 @@ export const EmailEditCtrl = angular.module('orcidApp').controller(
             $scope.$on(
                 'unverifiedSetPrimary', 
                 function(event, data){
-                    if (data.newValue == true 
+                    $timeout(function(){
+                        if (data.newValue == true 
                         && configuration.showModalManualEditVerificationEnabled == true) {
-                        $scope.showUnverifiedEmailSetPrimaryBox = true;
-                    }
-                    else {
-                        $scope.showUnverifiedEmailSetPrimaryBox =false;
-                    }
-                    $scope.$apply(); 
+                            $scope.showUnverifiedEmailSetPrimaryBox = true;
+                        }
+                        else {
+                            $scope.showUnverifiedEmailSetPrimaryBox =false;
+                        }
+                    });
                 }
             );
 
@@ -225,18 +226,20 @@ export const EmailEditCtrl = angular.module('orcidApp').controller(
                 
                 if( popup ){
                     $scope.emailSrvc.verifyEmail(email,function(data) {
-                        $scope.showEmailVerifBox = true;
-                        $scope.$apply();
-                        $.colorbox.resize();
-                   });    
-                }else{
-                    $scope.emailSrvc.verifyEmail(email,function(data) {
-                        $.colorbox({
-                            html : $compile($('#settings-verify-email-modal').html())($scope) 
-                            //Name was changed to avoid conflicts with workspace verify email modal
+                        $timeout(function(){
+                            $scope.showEmailVerifBox = true;
+                            $.colorbox.resize();
                         });
-                        $scope.$apply();
-                        $.colorbox.resize();
+                   });    
+                } else{
+                    $scope.emailSrvc.verifyEmail(email,function(data) {
+                        $timeout(function(){
+                            $.colorbox({
+                                html : $compile($('#settings-verify-email-modal').html())($scope) 
+                                //Name was changed to avoid conflicts with workspace verify email modal
+                            });
+                            $.colorbox.resize();
+                        });
                    });    
                 }
                 
