@@ -20,8 +20,12 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.firefox.FirefoxProfile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BlackBoxWebDriver {
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(BlackBoxWebDriver.class);
    
     final Thread shutdownHook = new Thread()
     {
@@ -38,13 +42,17 @@ public class BlackBoxWebDriver {
     
     private static WebDriver webDriver;
     static {
-        FirefoxProfile fireFoxProfile = new FirefoxProfile();
-        fireFoxProfile.setAcceptUntrustedCertificates(true);
-        FirefoxOptions options = new FirefoxOptions();
-        options.setCapability(FirefoxDriver.PROFILE, fireFoxProfile);
-        // Marionette does not allow untrusted certs yet
-        options.setCapability(FirefoxDriver.MARIONETTE, false);
-        webDriver = new FirefoxDriver(options);
+        try {
+            FirefoxProfile fireFoxProfile = new FirefoxProfile();
+            fireFoxProfile.setAcceptUntrustedCertificates(true);
+            FirefoxOptions options = new FirefoxOptions();
+            options.setCapability(FirefoxDriver.PROFILE, fireFoxProfile);
+            // Marionette does not allow untrusted certs yet
+            options.setCapability(FirefoxDriver.MARIONETTE, false);
+            webDriver = new FirefoxDriver(options);
+        } catch (Exception e) {
+            LOGGER.error("Error starting firefox driver", e);
+        }
     }
 
     public static WebDriver getWebDriver() {
