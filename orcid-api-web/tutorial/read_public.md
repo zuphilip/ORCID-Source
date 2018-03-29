@@ -1,6 +1,6 @@
 # Read Public information from an ORCID Record
 
-This tutorial shows how to read public information from ORCID records without going through the 3-step OAuth process. If you do not have the list of autenticated ORCID iDs you want to read, we suggest using the OAuth process to collect iDs and read information on the records. See the [tutorial to get authenticate iDs](https://github.com/ORCID/ORCID-Source/blob/TechDocs/orcid-api-web/tutorial/get_id.md).
+This tutorial shows how to read public information from ORCID records without going through the 3-step OAuth process. If you do not have the list of authenticated ORCID iDs you want to read, we suggest using the OAuth process to collect iDs and read information on the records. See the [tutorial to get authenticate iDs](https://github.com/ORCID/ORCID-Source/blob/TechDocs/orcid-api-web/tutorial/get_id.md).
 
 This workflow can be used with Public or Member API credentials on sandbox or the production servers.
 
@@ -21,7 +21,7 @@ Send a request to the ORCID API for a two step token
 **Curl Example**
 
 ```
-curl -i -d 'client_id=APP-674MCQQR985VZZQ2' -d 'client_secret=d08b711e-9411-788d-a474-46efd3956652' -d 'scope=/read-public' -d 'grant_type=client_credentials' 'https://sandbox.orcid.org/oauth/token'
+curl -i -d "client_id=APP-674MCQQR985VZZQ2" -d "client_secret=d08b711e-9411-788d-a474-46efd3956652" -d "scope=/read-public" -d "grant_type=client_credentials" "https://sandbox.orcid.org/oauth/token"
 ```
 
 Example response:
@@ -37,7 +37,7 @@ Version is the the version of the API you are using, the latest stable release i
 
 | Option| Value        |
 |--------------------|--------------------------|
-| URL 				| https<i></i>://api.sandbox.orcid.org/[version]/[ORCID iD]/[endpoint]|
+| URL 				| https://api.sandbox.orcid.org/[version]/[ORCID iD]/[endpoint]|
 | method    | GET |
 | header    | Content-Type: application/orcid+xml OR  Content-Type: application/orcid+json|
 | header    | Authorization: Bearer [Your /read-public access token]|
@@ -45,14 +45,14 @@ Version is the the version of the API you are using, the latest stable release i
 **Curl example:**
 
 ```
-curl -H 'Content-Type: application/orcid+xml' -H 'Authorization: Bearer 89f0181c-168b-4d7d-831c-1fdda2d7bbbb' 'https://api.sandbox.orcid.org/v2.1/0000-0001-2345-6789/record' -i
+curl -H "Content-Type: application/orcid+xml" -H "Authorization: Bearer 89f0181c-168b-4d7d-831c-1fdda2d7bbbb" "https://api.sandbox.orcid.org/v2.1/0000-0001-2345-6789/record" -i
 ```
 
 ### Public API
 
 | Option| Value        |
 |--------------------|--------------------------|
-| URL 				| https<i></i>://pub.sandbox.orcid.org/[version]/[ORCID iD]/[endpoint]|
+| URL 				| https://pub.sandbox.orcid.org/[version]/[ORCID iD]/[endpoint]|
 | method    | GET |
 | header    | Content-Type: application/orcid+xml OR  Content-Type: application/orcid+json|
 | header    | Authorization: Bearer [Your /read-public access token]|
@@ -60,7 +60,7 @@ curl -H 'Content-Type: application/orcid+xml' -H 'Authorization: Bearer 89f0181c
 **Curl example:**
 
 ```
-curl -H 'Content-Type: application/orcid+xml' -H 'Authorization: Bearer 89f0181c-168b-4d7d-831c-1fdda2d7bbbb' 'https://pub.sandbox.orcid.org/v2.1/0000-0001-2345-6789/personal-details' -i
+curl -H "Content-Type: application/orcid+xml" -H "Authorization: Bearer 89f0181c-168b-4d7d-831c-1fdda2d7bbbb" 'https://pub.sandbox.orcid.org/v2.1/0000-0001-2345-6789/personal-details" -i
 ```
 
 See the current [XSD documentation](https://github.com/ORCID/ORCID-Source/blob/master/orcid-model/src/main/resources/record_2.1/README.md#calls) for possible endpoints.
