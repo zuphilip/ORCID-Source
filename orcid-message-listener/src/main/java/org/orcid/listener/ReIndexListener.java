@@ -6,7 +6,6 @@ import java.util.concurrent.Executors;
 
 import javax.annotation.Resource;
 import javax.jms.Message;
-import javax.jms.MessageListener;
 import javax.xml.bind.JAXBException;
 
 import org.orcid.listener.mongo.MongoMessageProcessor;
@@ -16,11 +15,14 @@ import org.orcid.utils.listener.LastModifiedMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.jms.annotation.JmsListener;
+import org.springframework.stereotype.Component;
 
 import com.amazonaws.AmazonClientException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-public class ReIndexListener extends BaseListener implements MessageListener {
+@Component
+public class ReIndexListener extends BaseListener {
 
     Logger LOG = LoggerFactory.getLogger(ReIndexListener.class);
 
@@ -50,17 +52,22 @@ public class ReIndexListener extends BaseListener implements MessageListener {
      * @throws JAXBException
      * @throws AmazonClientException
      */
-    @Override
+    @JmsListener(destination = "Consumer.Summaries.VirtualTopic.Reindex", concurrency = "6")
     public void onMessage(Message message) {
-        executor.submit(() -> {
-            Map<String, String> map = getMapFromMessage(message);
-            LastModifiedMessage lastModifiedMessage = new LastModifiedMessage(map);
-            String orcid = lastModifiedMessage.getOrcid();
-            LOG.info("Recieved " + reindexTopicName + " message for orcid " + orcid + " " + lastModifiedMessage.getLastUpdated());
-            s3Processor.accept(lastModifiedMessage);
-            solrProcessor.accept(lastModifiedMessage);
-            mongoProcessor.accept(lastModifiedMessage);
-        });
+        Map<String, String> map = getMapFromMessage(message);
+        LastModifiedMessage lastModifiedMessage = new LastModifiedMessage(map);
+        String orcid = lastModifiedMessage.getOrcid();
+        LOG.info("Received message for orcid " + orcid + " on thread " + Thread.currentThread().getName());
+        
+//        executor.submit(() -> {
+//            Map<String, String> map = getMapFromMessage(message);
+//            LastModifiedMessage lastModifiedMessage = new LastModifiedMessage(map);
+//            String orcid = lastModifiedMessage.getOrcid();
+//            LOG.info("Recieved " + reindexTopicName + " message for orcid " + orcid + " " + lastModifiedMessage.getLastUpdated());
+//            s3Processor.accept(lastModifiedMessage);
+//            solrProcessor.accept(lastModifiedMessage);
+//            mongoProcessor.accept(lastModifiedMessage);
+//        });
 
     }
 }

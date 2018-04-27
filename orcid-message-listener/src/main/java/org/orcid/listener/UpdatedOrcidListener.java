@@ -4,12 +4,13 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.jms.Message;
-import javax.jms.MessageListener;
 
 import org.orcid.utils.listener.LastModifiedMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.jms.annotation.JmsListener;
+import org.springframework.stereotype.Component;
 
 /**
  * This class forms the basis of the message drive data dump and SOLR index
@@ -27,7 +28,8 @@ import org.springframework.beans.factory.annotation.Value;
  * @author tom
  *
  */
-public class UpdatedOrcidListener extends BaseListener implements MessageListener {
+@Component
+public class UpdatedOrcidListener extends BaseListener {
 
     Logger LOG = LoggerFactory.getLogger(UpdatedOrcidListener.class);
 
@@ -43,7 +45,7 @@ public class UpdatedOrcidListener extends BaseListener implements MessageListene
      * 
      * @param message
      */
-    @Override
+    @JmsListener(destination = "Consumer.Summaries.VirtualTopic.Updates", concurrency = "6")
     public void onMessage(Message message) {
         Map<String, String> map = getMapFromMessage(message);
         LastModifiedMessage lastModifiedMessage = new LastModifiedMessage(map);
