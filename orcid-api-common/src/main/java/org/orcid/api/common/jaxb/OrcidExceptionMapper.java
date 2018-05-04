@@ -1,5 +1,8 @@
 package org.orcid.api.common.jaxb;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -21,9 +24,11 @@ import org.orcid.core.exception.ExceedMaxNumberOfElementsException;
 import org.orcid.core.exception.OrcidApiException;
 import org.orcid.core.exception.OrcidCoreExceptionMapper;
 import org.orcid.core.exception.OrcidDeprecatedException;
+import org.orcid.core.exception.OrcidDuplicatedActivityException;
 import org.orcid.core.exception.OrcidInvalidScopeException;
 import org.orcid.core.exception.OrcidNotClaimedException;
 import org.orcid.core.exception.OrcidValidationException;
+import org.orcid.core.exception.WrongSourceException;
 import org.orcid.core.locale.LocaleManager;
 import org.orcid.core.manager.OrcidSecurityManager;
 import org.orcid.core.manager.impl.OrcidUrlManager;
@@ -95,10 +100,13 @@ public class OrcidExceptionMapper implements ExceptionMapper<Throwable> {
             LOGGER.error("An exception has occured, no client id info provided", t);
         } else {
             if (t instanceof NotFoundException) {
-                StringBuffer temp = new StringBuffer("An exception has occured processing request from client ").append(clientId).append(". ").append(t.getMessage());
-                LOGGER.error(temp.toString());
+                LOGGER.error("An exception has occured processing request from client " + clientId + " " + t.toString());
+            } else if (t instanceof OrcidDuplicatedActivityException) {
+                LOGGER.error("An exception has occured processing request from client " + clientId + " " +  t.toString() + " -- params:" + ((OrcidDuplicatedActivityException)t).getParams().toString());
+            } else if (t instanceof WrongSourceException) {
+                LOGGER.error("An exception has occured processing request from client " + clientId + " " + t.toString() + " -- params:" + ((WrongSourceException)t).getParams().toString());
             } else {
-                LOGGER.error("An exception has occured processing request from client " + clientId, t);
+                LOGGER.error("An exception has occured processing request from client " + clientId + " " + t.toString(), t);
             }
         }
 
