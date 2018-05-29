@@ -20,8 +20,6 @@ v2.0 is the current release of the ORCID API and should be used for all developm
 **not stable**
 - [error-2.0.xsd](https://github.com/ORCID/ORCID-Source/blob/master/orcid-model/src/main/resources/record_2.0/error-2.0.xsd)
 **stable**
-- [external-identifier-2.0.xsd](https://github.com/ORCID/ORCID-Source/blob/master/orcid-model/src/main/resources/record_2.0/external-identifier-2.0.xsd)
-**stable**
 - [funding-2.0.xsd](https://github.com/ORCID/ORCID-Source/blob/master/orcid-model/src/main/resources/record_2.0/funding-2.0.xsd)
 **stable**
 - [keyword-2.0.xsd](https://github.com/ORCID/ORCID-Source/blob/master/orcid-model/src/main/resources/record_2.0/keyword-2.0.xsd)
@@ -34,6 +32,8 @@ v2.0 is the current release of the ORCID API and should be used for all developm
 **stable**
 - [personal-details-2.0.xsd](https://github.com/ORCID/ORCID-Source/blob/master/orcid-model/src/main/resources/record_2.0/personal-details-2.0.xsd)
 **stable**
+- [person-external-identifier-2.0.xsd](https://github.com/ORCID/ORCID-Source/blob/master/orcid-model/src/main/resources/record_2.0/person-external-identifier-2.0.xsd)
+**stable**
 - [researcher-url-2.0.xsd](https://github.com/ORCID/ORCID-Source/blob/master/orcid-model/src/main/resources/record_2.0/researcher-url-2.0.xsd)
 **stable**
 - [search-2.0.xsd](https://github.com/ORCID/ORCID-Source/blob/master/orcid-model/src/main/resources/record_2.0/search-2.0.xsd)
@@ -43,21 +43,21 @@ v2.0 is the current release of the ORCID API and should be used for all developm
 
 ## Changes from Release candidate 2.0_rc3:
 ### Search
-- Addition of search endpoints
+- Addition of search endpoints.
 
 ### Peer-review
-- Change external-id-type 'PEER-REVIEW' to 'peer-review'
-- Addition of 'peer-review service' as a group type for peer-reviews
-- Peer-review groups look-up by name option
+- Change external-id-type 'PEER-REVIEW' to 'peer-review'.
+- Addition of 'peer-review service' as a group type for peer-reviews.
+- Peer-review groups lookup by name option.
 
 ### Email addresses
-- Include primary and verified status when reading an email address
+- Include primary and verified status when reading an email address.
 
 ## Changes from Version 1.2
 A number of changes to the ORCID API have been made to improve on the existing 1.2 release, this section highlights the most notable changes.
 
 ### Multiple XSD
-The ORCID Messages Schema has been broken down in to multiple files. Namespaces are now used and common elements are reused in multiple sections.
+The ORCID Messages Schema has been broken down into multiple files. Namespaces are now used and common elements are reused in multiple sections.
 
 ### Per item API
 With version 2.0 the ORCID API information is now added, updated, and read as individual items, as compared to entire sections of a record as was the case with 1.2. Existing items are read, updated or deleted using their put-code, and new items must be posted individually (with the exception of works which can be added up to 100 at a time). To read an entire section of a record the activities summary can be accessed.
@@ -71,16 +71,16 @@ Funding, Works and Peer-review items are grouped together based on a common exte
 
 ### New attributes for items
 - *put-code* attribute on the parent field of an item to uniquely identify that item within the ORCID Registry
-- *display-index* indicates the order the researcher has ranked this item within its group or section, higher display indexes appear first. (By deafulat all items added via the API will have their display index set to 0, the display index will update when the order is edited by the researcher.)
+- *display-index* indicates the order the researcher has ranked this item within its group or section, higher display indexes appear first. (By default all items added via the API will have their display index set to 0, the display index will update when the order is edited by the researcher.)
 
 ### Additional metadata about items on the record 
- - *created date* when the item was first added to the ORCID record
+ - *created date* when the item was first added to the ORCID record.
  - *last-modified-date* when the item was changed, such as being edited or having its visibility changed. 
  - *source*  who added the item to the record. Items added via the API will have the *source-client-id* field to record the client iD, items added by the researcher will use the *source-orcid* field to record the researcher's ORCID iD.
 
 ### Additional external identifier fields
-- *external-id-url* indicates how the identifier will resolve
-- *external-id-relationship* indicates the relationship between the item and the identifier
+- *external-id-url* indicates how the identifier will resolve.
+- *external-id-relationship* indicates the relationship between the item and the identifier.
 
 ### Peer-review
 A new activities section, peer-review, captures the formal review activity of researchers.
@@ -89,7 +89,7 @@ A new activities section, peer-review, captures the formal review activity of re
 The 2.0 API can not be used to edit the fields give-name, family-name or biography. 
 
 ### Repeatable address field
-With 2.0 the address field can be repeated
+With 2.0 the address field can be repeated.
 
 
 ## Sample files:
@@ -97,8 +97,8 @@ With 2.0 the address field can be repeated
 - [read activities-2.0.xml](https://github.com/ORCID/ORCID-Source/blob/master/orcid-model/src/main/resources/record_2.0/samples/read_samples/activities-2.0.xml)
 - [read address-2.0.xml](https://github.com/ORCID/ORCID-Source/blob/master/orcid-model/src/main/resources/record_2.0/samples/read_samples/address-2.0.xml)
 - [write address-2.0.xml](https://github.com/ORCID/ORCID-Source/blob/master/orcid-model/src/main/resources/record_2.0/samples/write_sample/address-2.0.xml)
-- [write bulk-work xml-2.0.xml](https://github.com/ORCID/ORCID-Source/blob/master/orcid-model/src/main/resources/record_2.0/samples/write_samples/bulk-work-2.0.xml)
-- [write bulk-work-2.0.json](https://github.com/ORCID/ORCID-Source/blob/master/orcid-model/src/main/resources/record_2.0/samples/write_samples/bulk-work-2.0.json)
+- [write bulk-work xml-2.0.xml](https://github.com/ORCID/ORCID-Source/blob/master/orcid-model/src/main/resources/record_2.0/samples/write_sample/bulk-work-2.0.xml)
+- [write bulk-work-2.0.json](https://github.com/ORCID/ORCID-Source/blob/master/orcid-model/src/main/resources/record_2.0/samples/write_sample/bulk-work-2.0.json)
 - [read biography-2.0.xml](https://github.com/ORCID/ORCID-Source/blob/master/orcid-model/src/main/resources/record_2.0/samples/read_samples/biography-2.0.xml)
 - [read education-2.0.xml](https://github.com/ORCID/ORCID-Source/blob/master/orcid-model/src/main/resources/record_2.0/samples/read_samples/education-2.0.xml)
 - [write education-2.0.xml](https://github.com/ORCID/ORCID-Source/blob/master/orcid-model/src/main/resources/record_2.0/samples/write_sample/education-2.0.xml)
