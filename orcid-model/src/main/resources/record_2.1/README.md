@@ -20,8 +20,6 @@ v2.1 is a current stable release of the ORCID API.
 **not stable**
 - [error-2.1.xsd](https://github.com/ORCID/ORCID-Source/blob/master/orcid-model/src/main/resources/record_2.1/error-2.1.xsd)
 **stable**
-- [external-identifier-2.1.xsd](https://github.com/ORCID/ORCID-Source/blob/master/orcid-model/src/main/resources/record_2.1/external-identifier-2.1.xsd)
-**stable**
 - [funding-2.1.xsd](https://github.com/ORCID/ORCID-Source/blob/master/orcid-model/src/main/resources/record_2.1/funding-2.1.xsd)
 **stable**
 - [keyword-2.1.xsd](https://github.com/ORCID/ORCID-Source/blob/master/orcid-model/src/main/resources/record_2.1/keyword-2.1.xsd)
@@ -33,6 +31,8 @@ v2.1 is a current stable release of the ORCID API.
 - [person-2.1.xsd](https://github.com/ORCID/ORCID-Source/blob/master/orcid-model/src/main/resources/record_2.1/person-2.1.xsd)
 **stable**
 - [personal-details-2.1.xsd](https://github.com/ORCID/ORCID-Source/blob/master/orcid-model/src/main/resources/record_2.1/personal-details-2.1.xsd)
+**stable**
+- [person-external-identifier-2.1.xsd](https://github.com/ORCID/ORCID-Source/blob/master/orcid-model/src/main/resources/record_2.1/person-external-identifier-2.1.xsd)
 **stable**
 - [record-2.1.xsd](https://github.com/ORCID/ORCID-Source/blob/master/orcid-model/src/main/resources/record_2.1/record-2.1.xsd)
 **stable**
@@ -61,8 +61,8 @@ Example of a source ORCID iD in 2.1
 - [read activities-2.1.xml](https://github.com/ORCID/ORCID-Source/blob/master/orcid-model/src/main/resources/record_2.1/samples/read_samples/activities-2.1.xml)
 - [read address-2.1.xml](https://github.com/ORCID/ORCID-Source/blob/master/orcid-model/src/main/resources/record_2.1/samples/read_samples/address-2.1.xml)
 - [write address-2.1.xml](https://github.com/ORCID/ORCID-Source/blob/master/orcid-model/src/main/resources/record_2.1/samples/write_sample/address-2.1.xml)
-- [write bulk-work xml-2.1.xml](https://github.com/ORCID/ORCID-Source/blob/master/orcid-model/src/main/resources/record_2.1/samples/write_samples/bulk-work-2.1.xml)
-- [write bulk-work-2.1.json](https://github.com/ORCID/ORCID-Source/blob/master/orcid-model/src/main/resources/record_2.1/samples/write_samples/bulk-work-2.1.json)
+- [write bulk-work xml-2.1.xml](https://github.com/ORCID/ORCID-Source/blob/master/orcid-model/src/main/resources/record_2.1/samples/write_sample/bulk-work-2.1.xml)
+- [write bulk-work-2.1.json](https://github.com/ORCID/ORCID-Source/blob/master/orcid-model/src/main/resources/record_2.1/samples/write_sample/bulk-work-2.1.json)
 - [read biography-2.1.xml](https://github.com/ORCID/ORCID-Source/blob/master/orcid-model/src/main/resources/record_2.1/samples/read_samples/biography-2.1.xml)
 - [read education-2.1.xml](https://github.com/ORCID/ORCID-Source/blob/master/orcid-model/src/main/resources/record_2.1/samples/read_samples/education-2.1.xml)
 - [write education-2.1.xml](https://github.com/ORCID/ORCID-Source/blob/master/orcid-model/src/main/resources/record_2.1/samples/write_sample/education-2.1.xml)
