@@ -81,10 +81,10 @@
 
     <#include "/macros/orcid_ga.ftl">
     
-    <link rel="stylesheet" href="${staticLoc}/css/noto-sans-googlefonts.css"/> <!-- Src: //fonts.googleapis.com/css?family=Noto+Sans:400,700 -->
-    <link rel="stylesheet" href="${staticLoc}/css/glyphicons.css"/>
-    <link rel="stylesheet" href="${staticLoc}/css/social.css"/>
-    <link rel="stylesheet" href="${staticLoc}/css/filetypes.css"/>    
+    <link rel="stylesheet" href="${staticCdn}/css/noto-sans-googlefonts.css"/> <!-- Src: //fonts.googleapis.com/css?family=Noto+Sans:400,700 -->
+    <link rel="stylesheet" href="${staticCdn}/css/glyphicons.css"/>
+    <link rel="stylesheet" href="${staticCdn}/css/social.css"/>
+    <link rel="stylesheet" href="${staticCdn}/css/filetypes.css"/>    
     
     <!-- Always remember to remove Glyphicons font reference when bootstrap is updated -->
     <link rel="stylesheet" href="${staticCdn}/twitter-bootstrap/3.3.6/css/bootstrap.min.css"/>
@@ -125,7 +125,7 @@
 
     <link rel="shortcut icon" href="${staticCdn}/img/favicon.ico"/>
     <link rel="apple-touch-icon" href="${staticCdn}/img/apple-touch-icon.png" />  
-    <link rel="stylesheet" href="${staticLoc}/css/noto-font.css"/> 
+    <link rel="stylesheet" href="${staticCdn}/css/noto-font.css"/> 
 
     <!-- ***************************************************** -->
     <!-- Ng2 Templates - BEGIN -->
