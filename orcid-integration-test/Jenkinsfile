@@ -11,7 +11,7 @@ node {
                 description: 'Branch or Tag to checkout and build', 
                 name: 'release_name'),
             string(
-                defaultValue: "file:///var/lib/jenkins/workspace/orcid-integration-test/orcid-persistence/src/main/resources/staging-persistence.properties,classpath:test-client.properties,classpath:test-web.properties", 
+                defaultValue: "file:///var/lib/jenkins/workspace/orcid-integration-test/orcid-persistence/src/main/resources/staging-persistence.properties", 
                 description: 'Persistence properties file', 
                 name: 'org_orcid_config_file'),
             string(
@@ -33,14 +33,52 @@ node {
 
     def gecko_home = '/usr/local/bin/geckodriver'
 
-    stage('Rebuild core release'){
-        do_maven("clean install -Dmaven.test.skip=true -DskipTest -Dlicense.skip=true")
+    stage('SETUP VERSIONS'){
+        try {
+            do_maven("versions:set -DnewVersion=${BUILD_NUMBER}-bbtests -f orcid-test/pom.xml")
+            do_maven("versions:set -DnewVersion=${BUILD_NUMBER}-bbtests -f orcid-model/pom.xml")
+            do_maven("versions:set -DnewVersion=${BUILD_NUMBER}-bbtests")
+        } catch(err){
+            echo err.toString()
+            throw err
+        }
     }
-
-    stage('Setup database'){
-        sh "whoami"
-        sh "psql -U jenkins -d orcid -f /var/lib/jenkins/clean_all_tables.sql"
-        sh "psql  -U jenkins -d orcid -f /var/lib/jenkins/add_disambiguated_orgs.sql"
+    stage('BUILD SOURCE'){
+        try {
+            do_maven("clean install -D maven.test.skip=true -D license.skip=true -f orcid-test/pom.xml")
+            do_maven("clean install -D maven.test.skip=true -D license.skip=true -f orcid-model/pom.xml")
+            do_maven("clean install -D maven.test.skip=true -D license.skip=true")
+        } catch(err){
+            echo err.toString()
+            throw err
+        }
+    }
+    stage('Clean All Tables'){
+        try {
+            sh "psql -U jenkins -d orcid -f ~/clean_all_tables.sql"
+        } catch(err){
+            echo err.toString()
+            throw err
+        }
+    }
+    stage('Add Disambiguated ORGS'){
+        try {
+            sh "psql -U jenkins -d orcid -f ~/add_disambiguated_orgs.sql"
+        } catch(err){
+            echo err.toString()
+            throw err
+        }
+    }
+    stage('Prepare indexed data'){
+        try {
+            echo "Including disambiguated orgs for indexing"
+            sh "mkdir -p ${WORKSPACE}/temp"
+            do_maven("exec:java -f orcid-core/pom.xml -Djava.io.tmpdir=${WORKSPACE}/temp -Dorg.orcid.config.file='${org_orcid_config_file}' -Dexec.mainClass='org.orcid.core.cli.ProcessDisambiguatedOrgsForIndexing'")
+        } catch(err){
+            echo err.toString()
+        }
+    }
+    stage('Setup Clients'){
         def setup_users = false
         try {
             timeout(time:10,unit:'SECONDS'){
@@ -56,37 +94,30 @@ node {
         } else {
             echo "Installing required users for blackbox tests"
             do_maven("test -f orcid-integration-test/pom.xml -Dtest=org.orcid.integration.whitebox.SetUpClientsAndUsers -DfailIfNoTests=false -Dorg.orcid.config.file='${org_orcid_config_file}'")
-            sh "psql  -U jenkins -d orcid -f /var/lib/jenkins/add_indexing_token.sql"
+            sh "psql -U jenkins -d orcid -f ~/add_indexing_token.sql"
         }
     }
-
     stage('Deploy release') {
-        echo "Installing CF txt file"
         orcid_tomcat_sh "cp ~/cdn_url_cf.txt ~/git/ORCID-Source/orcid-web/src/main/resources/cdn_url_cf.txt"
-        echo "Running python deployer"
         orcid_tomcat_sh "python ~/bin/scripts/deployment/deploy-app.py --release ${release_name} all"
-        //.Catalina.start Server startup in 369134 ms
         sh "sleep 400"
+        // alternative to 
+        /*timeout(400) {
+            waitUntil {
+            script {
+                def r = sh script: 'wget -q http://qa.orcid.org/tomcatUp.json -O /dev/null', returnStatus: true
+                return (r == 0);
+            }
+            }
+        }*/
     }
-
-    stage('Prepare indexed data'){
-        try {
-            echo "Including disambiguated orgs for indexing"
-            sh "mkdir -p ${WORKSPACE}/temp"
-            do_maven("exec:java -f orcid-core/pom.xml -Djava.io.tmpdir=${WORKSPACE}/temp -Dorg.orcid.config.file='${org_orcid_config_file}' -Dexec.mainClass='org.orcid.core.cli.ProcessDisambiguatedOrgsForIndexing'")
-        } catch(err){
-            echo err.toString()
-        }
-    }
-
     stage('Execute blackbox tests') {
         try {
             echo "Creating xvfb..."
             sh "Xvfb :1 -screen 0 1024x758x16 -fbdir /var/lib/jenkins/xvfb_jenkins & > /dev/null 2>&1 && echo \$! > /tmp/xvfb_jenkins.pid"
             sh "cat /tmp/xvfb_jenkins.pid"
             echo "Running BB tests..."
-            sh "sleep 260"
-            do_maven("test -f orcid-integration-test/pom.xml -Dtest='${test_class_name},!%regex[.*WithShibboleth.*]' -Dorg.orcid.config.file='${org_orcid_config_test_file}' -DfailIfNoTests=false -Dorg.orcid.persistence.db.url=jdbc:postgresql://localhost:5432/orcid -Dorg.orcid.persistence.db.dataSource=simpleDataSource -Dorg.orcid.persistence.statistics.db.dataSource=statisticsSimpleDataSource -Dwebdriver.firefox.bin=$firefox_home  -Dwebdriver.gecko.driver=$gecko_home")
+            do_maven("test -f orcid-integration-test/pom.xml -Dtest='${test_class_name},!*.ShibbolethTest*' -Dorg.orcid.config.file='${org_orcid_config_test_file}' -DfailIfNoTests=false -Dorg.orcid.persistence.db.url=jdbc:postgresql://localhost:5432/orcid -Dorg.orcid.persistence.db.dataSource=simpleDataSource -Dorg.orcid.persistence.statistics.db.dataSource=statisticsSimpleDataSource -Dwebdriver.firefox.bin=$firefox_home  -Dwebdriver.gecko.driver=$gecko_home")
             orcid_notify("BlackBoxTest ${release_name}#$BUILD_NUMBER OK [${JOB_URL}]", 'SUCCESS')
         } catch(Exception err) {
             def err_msg = err.getMessage()
@@ -106,6 +137,7 @@ def test_cleanup(){
     orcid_tomcat_sh "sh /home/orcid_tomcat/bin/tomcat/bin/shutdown.sh"
     echo "Destroying xvfb..."
     sh "XVFB_PID=\$(cat /tmp/xvfb_jenkins.pid) ; kill \$XVFB_PID"
+    sh "rm -rf /var/lib/jenkins/.m2/repository/org/orcid/orcid-**/*-bbtests"
 }
 
 def orcid_tomcat_sh(cmd){
