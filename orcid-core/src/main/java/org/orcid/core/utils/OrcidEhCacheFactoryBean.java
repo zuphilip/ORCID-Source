@@ -39,6 +39,8 @@ public class OrcidEhCacheFactoryBean implements FactoryBean<Cache<?, ?>>, Initia
     private long maxMegaBytesOnDisk = 0;
 
     private boolean copyValues = true;
+    
+    private boolean offHeap = false;
 
     private CacheLoaderWriter<Serializable, Serializable> cacheLoaderWriter;
 
@@ -100,6 +102,14 @@ public class OrcidEhCacheFactoryBean implements FactoryBean<Cache<?, ?>>, Initia
         this.copyValues = copyValues;
     }
 
+    public boolean isOffHeap() {
+        return offHeap;
+    }
+
+    public void setOffHeap(boolean offHeap) {
+        this.offHeap = offHeap;
+    }
+
     public void setCacheLoaderWriter(CacheLoaderWriter<Serializable, Serializable> cacheLoaderWriter) {
         this.cacheLoaderWriter = cacheLoaderWriter;
     }
@@ -125,9 +135,17 @@ public class OrcidEhCacheFactoryBean implements FactoryBean<Cache<?, ?>>, Initia
         if (existingCache == null) {
             ResourcePoolsBuilder resourcePoolsBuilder = ResourcePoolsBuilder.newResourcePoolsBuilder();
             if (this.maxMegaBytesInMemory > 0) {
-                resourcePoolsBuilder = resourcePoolsBuilder.heap(maxMegaBytesInMemory, MemoryUnit.MB);
+                if (offHeap) {
+                    resourcePoolsBuilder = resourcePoolsBuilder.offheap(maxMegaBytesInMemory, MemoryUnit.MB);
+                } else {
+                    resourcePoolsBuilder = resourcePoolsBuilder.heap(maxMegaBytesInMemory, MemoryUnit.MB);
+                }
             } else {
-                resourcePoolsBuilder = resourcePoolsBuilder.heap(this.maxElementsInMemory, EntryUnit.ENTRIES);
+                if (offHeap) {
+                    throw new IllegalStateException("Off heap is not possible with maxElementsInMemory, for cache " + cacheName);
+                } else {
+                    resourcePoolsBuilder = resourcePoolsBuilder.heap(this.maxElementsInMemory, EntryUnit.ENTRIES);
+                }
             }
             if (this.maxMegaBytesOnDisk > 0) {
                 resourcePoolsBuilder = resourcePoolsBuilder.disk(this.maxMegaBytesOnDisk, MemoryUnit.MB);
